@@ -44,106 +44,1217 @@
             </div>
         </div>
     </nav>
-    <main style="max-width:1300px;margin:0 auto;padding:2rem 0;">
-        <h1 style="text-align:center;">  "TESTING" Lorenz Attractor Playground</h1>
-        <canvas id="playground-lorenz"></canvas>
-        <form id="lorenz-controls" style="display:flex;justify-content:center;gap:2rem;align-items:center;margin:2rem 0 1rem 0;flex-wrap:wrap;">
-            <label>Sigma (σ): <input type="range" min="5" max="20" step="0.1" value="10" id="sigma-slider"></label>
-            <label>Rho (ρ): <input type="range" min="20" max="40" step="0.1" value="28" id="rho-slider"></label>
-            <label>Beta (β): <input type="range" min="2" max="4" step="0.01" value="2.6667" id="beta-slider"></label>
-            <label>Rotation Speed: <input type="range" min="0.001" max="0.05" step="0.001" value="0.010" id="speed-slider"></label>
-            <button type="button" id="reset-btn">Reset</button>
-        </form>
-        <p style="text-align:center;color:var(--text-secondary);font-size:1rem;">Drag with your mouse to rotate the attractor in 3D.</p>
-        <section style="max-width:900px;margin:2rem auto 0 auto;">
-            <h2> Math Formulas to check if LaTeX is working </h2>
-            <p>Here are some formulas rendered with LaTeX:</p>
-            <ul>
-                <li>Inline: $\dot{x} = \sigma (y - x)$</li>
-                <li>Block:
+    <main style="max-width:1300px;margin:0 auto;padding:2rem 0;position:relative;">
+        <h1 style="text-align:center;">IAM529 Interactive Playground</h1>
+        <p style="text-align:center;color:var(--text-secondary);font-size:1.1rem;margin-bottom:3rem;">Explore nonlinear dynamics through interactive visualizations and simulations</p>
+        
+        <!-- Fixed Notes Panel on Right Side -->
+        <div id="notes-panel" class="notes-panel">
+            <div class="notes-header">
+                <span class="notes-title">Notes</span>
+                <button id="notes-toggle" class="notes-toggle-icon" onclick="toggleNotesPanel()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            </div>
+            <div class="notes-content">
+                <textarea id="main-notes" class="main-notes-textarea" placeholder="Take notes about the Lorenz system, mathematical concepts, or your observations..."></textarea>
+                <div class="notes-actions">
+                    <button onclick="downloadNotes()" class="notes-action-btn">
+                        <i class="fas fa-download"></i> Download
+                    </button>
+                    <button onclick="clearNotes()" class="notes-action-btn secondary">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+                <div id="notes-status" class="notes-status"></div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="playground-grid">
+                <!-- Lorenz Attractor Card -->
+                <div class="playground-card active" onclick="openLorenzDemo()" style="cursor:pointer;">
+                    <div class="card-header">
+                        <h2>Lorenz Attractor</h2>
+                        <span class="card-status">Interactive</span>
+                    </div>
+                    <div class="card-content">
+                        <img src="assets/Lorenz_attractor.gif" alt="Lorenz Attractor Animation" class="card-gif">
+                        <p>Explore the famous chaotic system that exhibits sensitive dependence on initial conditions and demonstrates the butterfly effect.</p>
+                        <div class="card-features">
+                            <span class="feature-tag">3D Visualization</span>
+                            <span class="feature-tag">Parameter Control</span>
+                            <span class="feature-tag">Real-time Simulation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase Portraits Card -->
+                <div class="playground-card coming-soon">
+                    <div class="card-header">
+                        <h2>Phase Portraits</h2>
+                        <span class="card-status coming-soon">Coming Soon</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="placeholder-visual">
+                            <i class="fas fa-chart-line" style="font-size:4rem;color:#ccc;"></i>
+                        </div>
+                        <p>Visualize phase space trajectories and analyze equilibrium points of dynamical systems. Study stability properties and flow patterns.</p>
+                        <div class="card-features">
+                            <span class="feature-tag disabled">Vector Fields</span>
+                            <span class="feature-tag disabled">Stability Analysis</span>
+                            <span class="feature-tag disabled">Trajectory Plotting</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden Demo Section for Lorenz -->
+            <div id="lorenz-demo" style="display:none;max-width:900px;margin:3rem auto 0 auto;">
+                <div style="margin-bottom:2rem;">
+                    <h2>Lorenz System Interactive Demo</h2>
+                </div>
+                
+                <canvas id="playground-lorenz"></canvas>
+                
+                <style>
+                #playground-lorenz {
+                    width: 100%;
+                    height: 400px;
+                    border: none;
+                    border-radius: 8px;
+                    background: transparent;
+                    display: block;
+                    margin: 1rem 0;
+                }
+                </style>
+                
+                <form id="lorenz-controls" style="display:flex;justify-content:center;gap:2rem;align-items:center;margin:2rem 0 1rem 0;flex-wrap:wrap;">
+                    <label style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;color:#444;">σ: <input type="range" min="5" max="20" step="0.1" value="10" id="sigma-slider" style="margin-left:0.5rem;"></label>
+                    <label style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;color:#444;">ρ: <input type="range" min="20" max="40" step="0.1" value="28" id="rho-slider" style="margin-left:0.5rem;"></label>
+                    <label style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;color:#444;">β: <input type="range" min="2" max="4" step="0.01" value="2.6667" id="beta-slider" style="margin-left:0.5rem;"></label>
+                    <label style="font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;color:#444;">Speed: <input type="range" min="0.001" max="0.05" step="0.001" value="0.010" id="speed-slider" style="margin-left:0.5rem;"></label>
+                    <button type="button" id="reset-btn" style="background:#f5f5f5;border:1px solid #ccc;padding:0.5rem 1rem;border-radius:4px;font-family:'SF Mono',Monaco,monospace;font-size:0.9rem;cursor:pointer;">Reset</button>
+                </form>
+                <p style="text-align:center;color:var(--text-secondary);font-size:1rem;">Drag with your mouse to rotate the attractor in 3D.</p>
+                
+                <!-- Lorenz-specific LaTeX Testing -->
+                <section style="margin:3rem 0;">
+                    <h3>Lorenz System Mathematics</h3>
+                    <p>Testing LaTeX rendering with Lorenz attractor equations and symbols:</p>
+                    
+                    <p>The Lorenz system: $\dot{x} = \sigma(y-x)$, $\dot{y} = x(\rho-z)-y$, $\dot{z} = xy-\beta z$</p>
+                    
+                    <p>Parameters: $\sigma = 10$, $\rho = 28$, $\beta = \frac{8}{3}$</p>
+                    
+                    <p>Equilibrium points: $C_0 = (0,0,0)$ and $C_{\pm} = (\pm\sqrt{\beta(\rho-1)}, \pm\sqrt{\beta(\rho-1)}, \rho-1)$</p>
+                    
+                    <p>Complete system:</p>
                     $$
                     \begin{aligned}
-                    \dot{x} &= \sigma (y - x) \\
-                    \dot{y} &= x (\rho - z) - y \\
-                    \dot{z} &= x y - \beta z
+                    \frac{dx}{dt} &= \sigma (y - x) \\
+                    \frac{dy}{dt} &= x (\rho - z) - y \\
+                    \frac{dz}{dt} &= x y - \beta z
                     \end{aligned}
                     $$
-                </li>
-                <li>Eigenvalues: $\lambda = \frac{-(\sigma+1) \pm \sqrt{(\sigma+1)^2 + 4\sigma(\rho-1)}}{2}$</li>
-            </ul>
-            <h2>Code Example</h2>
-            <div class="code-card" style="position:relative;max-width:700px;margin:1.5rem auto 0 auto;background:var(--code-bg,#f5f5f5);border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.07);padding:1.2rem 1.2rem 1rem 1.2rem;">
-                <button class="copy-btn" style="position:absolute;top:12px;right:12px;padding:0.3rem 0.7rem;font-size:0.95rem;border:none;border-radius:6px;background:#e0e0e0;cursor:pointer;transition:background 0.2s;">Copy</button>
-                <pre style="margin:0;"><code class="python"># Lorenz system step
-sigma, rho, beta = 10, 28, 8/3
-x, y, z = 0.01, 0, 0
-dt = 0.01
-for _ in range(1000):
-    dx = sigma * (y - x)
-    dy = x * (rho - z) - y
-    dz = x * y - beta * z
-    x += dx * dt
-    y += dy * dt
-    z += dz * dt
+                    
+                    <p>Lyapunov exponents: $\lambda_1 > 0$, $\lambda_2 = 0$, $\lambda_3 < 0$</p>
+                    
+                    <p>Strange attractor dimension: $D_L = 2 + \frac{\lambda_1}{|\lambda_3|} \approx 2.06$</p>
+                </section>
+                
+                <section style="margin:3rem 0;">
+                    <button onclick="toggleCodeSection()" style="background:#f8f9fa;border:1px solid #ddd;color:#333;padding:0.7rem 1.2rem;border-radius:6px;font-size:0.95rem;cursor:pointer;font-family:'SF Mono',Monaco,monospace;">
+                        <span id="code-toggle-text">Show Code</span> <span id="code-toggle-icon">▼</span>
+                    </button>
+                    
+                    <div id="code-section" style="display:none;">
+                        <h3>Implementation Code</h3>
+                        
+                        <!-- Language Selection Tabs -->
+                        <div class="language-tabs" style="display:flex;gap:0.5rem;margin-bottom:1.5rem;border-bottom:1px solid #e0e0e0;">
+                            <button class="lang-tab active" data-lang="python" onclick="switchLanguage('python')">Python</button>
+                            <button class="lang-tab" data-lang="julia" onclick="switchLanguage('julia')">Julia</button>
+                            <button class="lang-tab" data-lang="javascript" onclick="switchLanguage('javascript')">JavaScript</button>
+                            <button class="lang-tab" data-lang="c" onclick="switchLanguage('c')">C</button>
+                            <button class="lang-tab" data-lang="matlab" onclick="switchLanguage('matlab')">MATLAB</button>
+                        </div>
+                        
+                        <div class="code-card-modern" style="position:relative;background:#fafafa;border:1px solid #e0e0e0;border-radius:8px;padding:1.5rem;">
+                            <div class="snippet-btn-bar" style="position:absolute;top:15px;right:20px;z-index:2;display:flex;gap:0.3rem;background:#fff;border:1px solid #ddd;border-radius:6px;padding:0.2rem 0.4rem;">
+                                <button class="snippet-btn-modern" id="copy-snippet" title="Copy code" tabindex="0" aria-label="Copy code"><i class="fas fa-copy"></i></button>
+                                <button class="snippet-btn-modern" id="download-snippet" title="Download code" tabindex="0" aria-label="Download code"><i class="fas fa-download"></i></button>
+                                <button class="snippet-btn-modern" id="open-colab" title="Open in Google Colab" tabindex="0" aria-label="Open in Google Colab" style="display:none;">
+                                    <i class="fab fa-google" style="color:#f9ab00;"></i>
+                                </button>
+                                <button class="snippet-btn-modern" id="share-snippet" title="Share code" tabindex="0" aria-label="Share code"><i class="fas fa-share"></i></button>
+                            </div>
+                            
+                            <!-- Python Code -->
+                            <div class="code-example" id="code-python" style="display:block;">
+                                <pre style="margin:0;background:#f5f5f5;padding:1.2rem;border-radius:6px;font-family:'SF Mono',Monaco,monospace;font-size:0.95rem;line-height:1.6;overflow-x:auto;">
+<code class="python"># Lorenz system numerical integration
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import odeint
+
+def lorenz_system(state, t, sigma, rho, beta):
+    x, y, z = state
+    dxdt = sigma * (y - x)
+    dydt = x * (rho - z) - y
+    dzdt = x * y - beta * z
+    return [dxdt, dydt, dzdt]
+
+# Parameters
+sigma, rho, beta = 10.0, 28.0, 8.0/3.0
+initial_state = [1.0, 1.0, 1.0]
+t = np.linspace(0, 25, 10000)
+
+# Solve system
+trajectory = odeint(lorenz_system, initial_state, t, args=(sigma, rho, beta))
+
+# Extract coordinates
+x, y, z = trajectory.T
+
+# 3D plot
+fig = plt.figure(figsize=(12, 9))
+ax = fig.add_subplot(111, projection='3d')
+ax.plot(x, y, z, lw=0.5, color='blue')
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_title('Lorenz Attractor')
+plt.show()
 </code></pre>
+                            </div>
+                            
+                            <!-- Julia Code -->
+                            <div class="code-example" id="code-julia" style="display:none;">
+                                <pre style="margin:0;background:#f5f5f5;padding:1.2rem;border-radius:6px;font-family:'SF Mono',Monaco,monospace;font-size:0.95rem;line-height:1.6;overflow-x:auto;">
+<code class="julia"># Lorenz system in Julia
+using DifferentialEquations, Plots
+
+function lorenz!(du, u, p, t)
+    σ, ρ, β = p
+    du[1] = σ * (u[2] - u[1])
+    du[2] = u[1] * (ρ - u[3]) - u[2]
+    du[3] = u[1] * u[2] - β * u[3]
+end
+
+# Parameters
+σ, ρ, β = 10.0, 28.0, 8.0/3.0
+u0 = [1.0, 1.0, 1.0]
+tspan = (0.0, 25.0)
+p = [σ, ρ, β]
+
+# Solve ODE
+prob = ODEProblem(lorenz!, u0, tspan, p)
+sol = solve(prob, Tsit5(), reltol=1e-8, abstol=1e-8)
+
+# Extract solution
+x = [u[1] for u in sol.u]
+y = [u[2] for u in sol.u]
+z = [u[3] for u in sol.u]
+
+# 3D plot
+plot(x, y, z, 
+     linewidth=0.5, 
+     color=:blue,
+     xlabel="X", 
+     ylabel="Y", 
+     zlabel="Z",
+     title="Lorenz Attractor")
+</code></pre>
+                            </div>
+                            
+                            <!-- JavaScript Code -->
+                            <div class="code-example" id="code-javascript" style="display:none;">
+                                <pre style="margin:0;background:#f5f5f5;padding:1.2rem;border-radius:6px;font-family:'SF Mono',Monaco,monospace;font-size:0.95rem;line-height:1.6;overflow-x:auto;">
+<code class="javascript">// Lorenz system in JavaScript
+function lorenzSystem(x, y, z, sigma, rho, beta, dt) {
+    const dx = sigma * (y - x) * dt;
+    const dy = (x * (rho - z) - y) * dt;
+    const dz = (x * y - beta * z) * dt;
+    return [dx, dy, dz];
+}
+
+function integrateLorenz(steps = 10000) {
+    const sigma = 10.0, rho = 28.0, beta = 8.0/3.0;
+    const dt = 0.01;
+    
+    let x = 1.0, y = 1.0, z = 1.0;
+    const trajectory = [];
+    
+    for (let i = 0; i < steps; i++) {
+        trajectory.push([x, y, z]);
+        
+        const [dx, dy, dz] = lorenzSystem(x, y, z, sigma, rho, beta, dt);
+        x += dx;
+        y += dy;
+        z += dz;
+    }
+    
+    return trajectory;
+}
+
+// Generate trajectory
+const points = integrateLorenz();
+
+// Plot using any plotting library (e.g., Three.js, Plotly.js)
+console.log(`Generated ${points.length} points`);
+console.log("First point:", points[0]);
+console.log("Last point:", points[points.length - 1]);
+</code></pre>
+                            </div>
+                            
+                            <!-- C Code -->
+                            <div class="code-example" id="code-c" style="display:none;">
+                                <pre style="margin:0;background:#f5f5f5;padding:1.2rem;border-radius:6px;font-family:'SF Mono',Monaco,monospace;font-size:0.95rem;line-height:1.6;overflow-x:auto;">
+<code class="c">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;math.h&gt;
+
+typedef struct {
+    double x, y, z;
+} Point3D;
+
+void lorenz_derivative(Point3D state, Point3D *derivative, 
+                      double sigma, double rho, double beta) {
+    derivative-&gt;x = sigma * (state.y - state.x);
+    derivative-&gt;y = state.x * (rho - state.z) - state.y;
+    derivative-&gt;z = state.x * state.y - beta * state.z;
+}
+
+void runge_kutta_4(Point3D *state, double dt, 
+                   double sigma, double rho, double beta) {
+    Point3D k1, k2, k3, k4, temp;
+    
+    // k1
+    lorenz_derivative(*state, &k1, sigma, rho, beta);
+    
+    // k2
+    temp.x = state-&gt;x + 0.5 * dt * k1.x;
+    temp.y = state-&gt;y + 0.5 * dt * k1.y;
+    temp.z = state-&gt;z + 0.5 * dt * k1.z;
+    lorenz_derivative(temp, &k2, sigma, rho, beta);
+    
+    // k3
+    temp.x = state-&gt;x + 0.5 * dt * k2.x;
+    temp.y = state-&gt;y + 0.5 * dt * k2.y;
+    temp.z = state-&gt;z + 0.5 * dt * k2.z;
+    lorenz_derivative(temp, &k3, sigma, rho, beta);
+    
+    // k4
+    temp.x = state-&gt;x + dt * k3.x;
+    temp.y = state-&gt;y + dt * k3.y;
+    temp.z = state-&gt;z + dt * k3.z;
+    lorenz_derivative(temp, &k4, sigma, rho, beta);
+    
+    // Update state
+    state-&gt;x += (dt/6.0) * (k1.x + 2*k2.x + 2*k3.x + k4.x);
+    state-&gt;y += (dt/6.0) * (k1.y + 2*k2.y + 2*k3.y + k4.y);
+    state-&gt;z += (dt/6.0) * (k1.z + 2*k2.z + 2*k3.z + k4.z);
+}
+
+int main() {
+    const double sigma = 10.0, rho = 28.0, beta = 8.0/3.0;
+    const double dt = 0.01;
+    const int steps = 100000;
+    
+    Point3D state = {1.0, 1.0, 1.0};
+    
+    printf("# Lorenz Attractor Data\n");
+    printf("# X Y Z\n");
+    
+    for (int i = 0; i < steps; i++) {
+        if (i % 100 == 0) {  // Print every 100th point
+            printf("%.6f %.6f %.6f\n", state.x, state.y, state.z);
+        }
+        runge_kutta_4(&state, dt, sigma, rho, beta);
+    }
+    
+    return 0;
+}
+</code></pre>
+                            </div>
+                            
+                            <!-- MATLAB Code -->
+                            <div class="code-example" id="code-matlab" style="display:none;">
+                                <pre style="margin:0;background:#f5f5f5;padding:1.2rem;border-radius:6px;font-family:'SF Mono',Monaco,monospace;font-size:0.95rem;line-height:1.6;overflow-x:auto;">
+<code class="matlab">function lorenz_attractor()
+    % Lorenz system parameters
+    sigma = 10.0;
+    rho = 28.0;
+    beta = 8.0/3.0;
+    
+    % Initial conditions
+    y0 = [1.0; 1.0; 1.0];
+    
+    % Time span
+    tspan = [0 25];
+    
+    % Solve ODE
+    [t, y] = ode45(@(t,y) lorenz_ode(t, y, sigma, rho, beta), tspan, y0);
+    
+    % Extract coordinates
+    x = y(:,1);
+    y_coord = y(:,2);
+    z = y(:,3);
+    
+    % 3D plot
+    figure;
+    plot3(x, y_coord, z, 'b-', 'LineWidth', 0.5);
+    xlabel('X');
+    ylabel('Y');
+    zlabel('Z');
+    title('Lorenz Attractor');
+    grid on;
+    axis equal;
+    view(3);
+end
+
+function dydt = lorenz_ode(t, y, sigma, rho, beta)
+    % Lorenz system differential equations
+    dydt = zeros(3,1);
+    dydt(1) = sigma * (y(2) - y(1));
+    dydt(2) = y(1) * (rho - y(3)) - y(2);
+    dydt(3) = y(1) * y(2) - beta * y(3);
+end
+
+% Run the simulation
+lorenz_attractor();
+</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.querySelectorAll('.copy-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const code = btn.parentElement.querySelector('code').innerText;
-                        navigator.clipboard.writeText(code);
-                        btn.textContent = 'Copied!';
-                        setTimeout(()=>{btn.textContent='Copy';}, 1200);
-                    });
-                });
-            });
-            </script>
-        </section>
-        <section style="max-width:900px;margin:2.5rem auto 0 auto;">
-            <h2>Try Python Live (Pyodide)</h2>
-            <div id="pyodide-runner" style="background:var(--code-bg,#f5f5f5);border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.07);padding:1.2rem 1.2rem 1rem 1.2rem;">
-                <textarea id="py-code" style="width:100%;height:140px;font-family:JetBrains Mono,monospace;font-size:1rem;border-radius:8px;padding:0.7rem 0.8rem;resize:vertical;">print('Hello from Pyodide!')\nfor i in range(5):\n    print('i =', i)</textarea>
-                <button id="run-py" style="margin-top:0.7rem;padding:0.4rem 1.2rem;font-size:1rem;border:none;border-radius:6px;background:#1976d2;color:#fff;cursor:pointer;float:right;">Run Python</button>
-                <div id="pyodide-status" style="margin-top:0.7rem;color:#888;font-size:0.95rem;">Loading Python (Pyodide)...</div>
-                <pre id="py-output" style="margin-top:1.2rem;background:#222;color:#fff;padding:1rem;border-radius:8px;min-height:2em;overflow-x:auto;"></pre>
-            </div>
-            <script type="text/javascript">
-            let pyodideReady = false;
-            let pyodide = null;
-            async function mainPyodide() {
-                pyodide = await loadPyodide();
-                pyodideReady = true;
-                document.getElementById('pyodide-status').textContent = 'Python ready!';
-            }
-            mainPyodide();
-            document.getElementById('run-py').onclick = async function() {
-                const code = document.getElementById('py-code').value;
-                const output = document.getElementById('py-output');
-                if (!pyodideReady) {
-                    output.textContent = 'Python is still loading...';
-                    return;
-                }
-                output.textContent = '';
-                try {
-                    let result = await pyodide.runPythonAsync(code);
-                    if (result !== undefined) {
-                        output.textContent += result + '\n';
-                    }
-                } catch (err) {
-                    output.textContent = err;
-                }
-                // Capture stdout
-                output.textContent = pyodide._module.FS.readFile('/dev/stdout', {encoding:'utf8'}) + output.textContent;
-                pyodide._module.FS.writeFile('/dev/stdout', '', {encoding:'utf8'});
-            };
-            </script>
-            <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
-        </section>
-        <div style="text-align:center;margin-top:2rem;">
-            <a href="index.html" class="nav-button">Back to Homepage</a>
         </div>
-    </main>
-    <script src="playground.js"></script>
+    </div>
+
+    <style>
+    @media (max-width: 768px) {
+        .notes-panel {
+            width: 100%;
+            top: 70px;
+        }
+        .notes-panel.open ~ .main-content {
+            margin-right: 0;
+            display: none;
+        }
+    }
+    
+    .playground-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+    
+    .playground-card {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+    
+    .playground-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    }
+    
+    .playground-card.active {
+        border-color: #1976d2;
+        box-shadow: 0 4px 20px rgba(25,118,210,0.15);
+    }
+    
+    .playground-card.coming-soon {
+        opacity: 0.7;
+    }
+    
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem 1.5rem 0 1.5rem;
+    }
+    
+    .card-header h2 {
+        margin: 0;
+        color: #333;
+        font-size: 1.4rem;
+    }
+    
+    .card-status {
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    
+    .card-status:not(.coming-soon) {
+        background: #e8f5e8;
+        color: #2e7d32;
+    }
+    
+    .card-status.coming-soon {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+    
+    .card-content {
+        padding: 1.5rem 1.5rem 2rem 1.5rem;
+    }
+    
+    .card-gif {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+    
+    .placeholder-visual {
+        width: 100%;
+        height: 200px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
+    
+    .card-content p {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .feature-tag {
+        padding: 0.3rem 0.8rem;
+        background: #e3f2fd;
+        color: #1976d2;
+        border-radius: 16px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .feature-tag.disabled {
+        background: #f5f5f5;
+        color: #999;
+    }
+    
+    /* Existing styles for snippet buttons and other elements */
+    .snippet-btn-bar {
+        transition: background 0.15s;
+    }
+    .snippet-btn-modern {
+        background: none;
+        border: none;
+        border-radius: 3px;
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        color: #555;
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s;
+        outline: none;
+    }
+    .snippet-btn-modern:hover, .snippet-btn-modern:focus {
+        background: #f0f0f0;
+        color: #333;
+    }
+    .snippet-btn-modern:active {
+        background: #e0e0e0;
+    }
+    .code-card-modern {
+        border-left: 3px solid #666;
+        background: #fafafa;
+    }
+    
+    /* Language tabs styling */
+    .lang-tab {
+        background: none;
+        border: none;
+        padding: 0.7rem 1.2rem;
+        cursor: pointer;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-size: 0.9rem;
+        color: #666;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s ease;
+        outline: none;
+    }
+    .lang-tab:hover {
+        color: #333;
+        background: #f8f9fa;
+    }
+    .lang-tab.active {
+        color: #1976d2;
+        border-bottom-color: #1976d2;
+        background: #f8f9fa;
+    }
+    
+    /* Notes styling */
+    .notes-toggle-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin: 1.5rem auto;
+        display: block;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.25);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+    }
+    .notes-toggle-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);
+    }
+    .notes-toggle-btn:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: left 0.5s;
+    }
+    .notes-toggle-btn:hover:before {
+        left: 100%;
+    }
+    .note-card {
+        background: #ffffff;
+        border: 1px solid #e1e5e9;
+        border-radius: 12px;
+        padding: 0;
+        margin: 2rem auto;
+        max-width: 700px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    .note-card:hover {
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        transform: translateY(-2px);
+    }
+    .note-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-bottom: 1px solid #e1e5e9;
+        margin: 0;
+    }
+    .note-label {
+        color: #1a202c;
+        font-weight: 600;
+        font-size: 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 0;
+    }
+    .note-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .note-download, .note-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1.1rem;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+    }
+    .note-download:hover {
+        background: #e8f4fd;
+        color: #0ea5e9;
+        transform: translateY(-1px);
+    }
+    .note-close:hover {
+        background: #fef2f2;
+        color: #ef4444;
+        transform: translateY(-1px);
+    }
+    .note-content {
+        padding: 1.5rem;
+    }
+    .note-textarea {
+        width: 100%;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        resize: vertical;
+        min-height: 120px;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+        background: #fafbfc;
+    }
+    .note-textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: #ffffff;
+    }
+    .note-status {
+        margin-top: 1rem;
+        color: #059669;
+        font-size: 0.85rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .note-status.show {
+        opacity: 1;
+    }
+    .note-status:before {
+        content: '✓';
+        background: #10b981;
+        color: white;
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: bold;
+    }
+    
+    /* Right-side Notes Panel Styling */
+    .main-content {
+        margin-right: 0;
+        transition: margin-right 0.3s ease;
+    }
+    
+    .notes-panel {
+        position: fixed;
+        top: 80px;
+        right: 0;
+        width: 350px;
+        height: calc(100vh - 100px);
+        background: #ffffff;
+        border-left: 1px solid #e0e0e0;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .notes-panel.open {
+        transform: translateX(0);
+    }
+    
+    .notes-panel.open ~ .main-content {
+        margin-right: 350px;
+    }
+    
+    .notes-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .notes-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a202c;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    .notes-toggle-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        color: #64748b;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .notes-toggle-icon:hover {
+        background: #f0f0f0;
+        color: #333;
+    }
+    
+    .notes-content {
+        flex: 1;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .main-notes-textarea {
+        flex: 1;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        resize: none;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+        background: #fafbfc;
+        outline: none;
+    }
+    
+    .main-notes-textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        background: #ffffff;
+    }
+    
+    .notes-actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .notes-action-btn {
+        flex: 1;
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .notes-action-btn:hover {
+        background: #5a67d8;
+        transform: translateY(-1px);
+    }
+    
+    .notes-action-btn.secondary {
+        background: #6b7280;
+    }
+    
+    .notes-action-btn.secondary:hover {
+        background: #4b5563;
+    }
+    
+    .notes-status {
+        margin-top: 1rem;
+        padding: 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .notes-status.show {
+        opacity: 1;
+        background: #ecfdf5;
+        color: #059669;
+    }
+    
+    @media (max-width: 1200px) {
+        .notes-panel {
+            width: 300px;
+        }
+        .notes-panel.open ~ .main-content {
+            margin-right: 300px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .playground-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+    </style>
+
+    <script>
+    let lorenzInitialized = false;
+    
+    function openLorenzDemo() {
+        document.querySelector('.playground-grid').style.display = 'none';
+        document.getElementById('lorenz-demo').style.display = 'block';
+        
+        // Initialize Lorenz visualization
+        setTimeout(() => {
+            if (!lorenzInitialized) {
+                initializeLorenzVisualization();
+                lorenzInitialized = true;
+            }
+        }, 100);
+    }
+    
+    function closeLorenzDemo() {
+        document.querySelector('.playground-grid').style.display = 'grid';
+        document.getElementById('lorenz-demo').style.display = 'none';
+    }
+    
+    function toggleCodeSection() {
+        const codeSection = document.getElementById('code-section');
+        const toggleText = document.getElementById('code-toggle-text');
+        const toggleIcon = document.getElementById('code-toggle-icon');
+        
+        if (codeSection.style.display === 'none' || codeSection.style.display === '') {
+            codeSection.style.display = 'block';
+            toggleText.textContent = 'Hide Code';
+            toggleIcon.textContent = '▲';
+        } else {
+            codeSection.style.display = 'none';
+            toggleText.textContent = 'Show Code';
+            toggleIcon.textContent = '▼';
+        }
+    }
+    
+    let currentLanguage = 'python';
+    
+    function switchLanguage(lang) {
+        // Hide all code examples
+        document.querySelectorAll('.code-example').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // Show selected language
+        const selectedCode = document.getElementById('code-' + lang);
+        if (selectedCode) {
+            selectedCode.style.display = 'block';
+        }
+        
+        // Update tab states
+        document.querySelectorAll('.lang-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelector(`[data-lang="${lang}"]`).classList.add('active');
+        
+        // Update current language
+        currentLanguage = lang;
+        
+        // Show/hide Colab button (only for Python and Julia)
+        const colabBtn = document.getElementById('open-colab');
+        if (lang === 'python' || lang === 'julia') {
+            colabBtn.style.display = 'flex';
+        } else {
+            colabBtn.style.display = 'none';
+        }
+    }
+    
+    function initializeLorenzVisualization() {
+        const canvas = document.getElementById('playground-lorenz');
+        const sigmaSlider = document.getElementById('sigma-slider');
+        const rhoSlider = document.getElementById('rho-slider');
+        const betaSlider = document.getElementById('beta-slider');
+        const speedSlider = document.getElementById('speed-slider');
+        const resetBtn = document.getElementById('reset-btn');
+
+        if (!canvas || !sigmaSlider || !rhoSlider || !betaSlider || !speedSlider || !resetBtn) {
+            console.log('Lorenz demo elements not found');
+            return;
+        }
+
+        let sigma = parseFloat(sigmaSlider.value);
+        let rho = parseFloat(rhoSlider.value);
+        let beta = parseFloat(betaSlider.value);
+        let rotationSpeed = parseFloat(speedSlider.value);
+
+        sigmaSlider.oninput = () => sigma = parseFloat(sigmaSlider.value);
+        rhoSlider.oninput = () => rho = parseFloat(rhoSlider.value);
+        betaSlider.oninput = () => beta = parseFloat(betaSlider.value);
+        speedSlider.oninput = () => rotationSpeed = parseFloat(speedSlider.value);
+
+        let x = 0.01, y = 0, z = 0;
+        const dt = 0.005;
+        let points = [];
+        let maxPoints = 3000;
+        let angleY = 0;
+        let angleX = 0;
+        let dragging = false;
+        let lastX = 0, lastY = 0;
+
+        function resetAttractor() {
+            x = 0.01; y = 0; z = 0;
+            points = [];
+            angleY = 0;
+            angleX = 0;
+        }
+        resetBtn.onclick = resetAttractor;
+
+        canvas.addEventListener('mousedown', e => {
+            dragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+        
+        canvas.addEventListener('mousemove', e => {
+            if (dragging) {
+                angleY += (e.clientX - lastX) * 0.01;
+                angleX += (e.clientY - lastY) * 0.01;
+                lastX = e.clientX;
+                lastY = e.clientY;
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => dragging = false);
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        resizeCanvas();
+
+        const ctx = canvas.getContext('2d');
+
+        function step() {
+            let dx = sigma * (y - x);
+            let dy = x * (rho - z) - y;
+            let dz = x * y - beta * z;
+            x += dx * dt;
+            y += dy * dt;
+            z += dz * dt;
+            points.push([x, y, z]);
+            if (points.length > maxPoints) points.shift();
+        }
+        
+        function project3D([x, y, z], angleY, angleX) {
+            let caY = Math.cos(angleY), saY = Math.sin(angleY);
+            let cx = x * caY - z * saY;
+            let cz = x * saY + z * caY;
+            let caX = Math.cos(angleX), saX = Math.sin(angleX);
+            let cy = y * caX - cz * saX;
+            let cz2 = y * saX + cz * caX;
+            let scaleX = canvas.width / 90;
+            let scaleY = canvas.height / 60;
+            let perspective = 350 / (350 - cz2);
+            let px = canvas.width/2 + cx * scaleX * perspective + 40;
+            let py = canvas.height/2 - cy * scaleY * perspective;
+            return [px, py];
+        }
+        
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            
+            for (let i = 1; i < points.length; ++i) {
+                let t = i / points.length;
+                ctx.lineWidth = 1 + 2 * t;
+                ctx.strokeStyle = `rgba(25, 118, 210, ${0.3 + 0.7 * t})`;
+                ctx.beginPath();
+                let [x0, y0] = project3D(points[i-1], angleY, angleX);
+                let [x1, y1] = project3D(points[i], angleY, angleX);
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y1);
+                ctx.stroke();
+            }
+        }
+        
+        function animate() {
+            for (let i = 0; i < 35; ++i) step();
+            angleY += rotationSpeed;
+            draw();
+            requestAnimationFrame(animate);
+        }
+        
+        console.log('Starting Lorenz animation...');
+        animate();
+    }
+    
+    // Notes panel functions
+    function toggleNotesPanel() {
+        const panel = document.getElementById('notes-panel');
+        const icon = document.querySelector('#notes-toggle i');
+        
+        panel.classList.toggle('open');
+        
+        if (panel.classList.contains('open')) {
+            icon.className = 'fas fa-chevron-right';
+        } else {
+            icon.className = 'fas fa-chevron-left';
+        }
+    }
+    
+    function downloadNotes() {
+        const textarea = document.getElementById('main-notes');
+        const content = textarea.value;
+        
+        if (content.trim() === '') {
+            showNotesStatus('No notes to download!', false);
+            return;
+        }
+        
+        const blob = new Blob([content], {type: 'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'lorenz-notes.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showNotesStatus('Notes downloaded!', true);
+    }
+    
+    function clearNotes() {
+        if (confirm('Are you sure you want to clear all notes?')) {
+            document.getElementById('main-notes').value = '';
+            localStorage.removeItem('main-notes');
+            showNotesStatus('Notes cleared!', true);
+        }
+    }
+    
+    function showNotesStatus(message, isSuccess) {
+        const status = document.getElementById('notes-status');
+        status.textContent = message;
+        status.classList.add('show');
+        
+        if (!isSuccess) {
+            status.style.background = '#fee2e2';
+            status.style.color = '#dc2626';
+        }
+        
+        setTimeout(() => {
+            status.classList.remove('show');
+            setTimeout(() => {
+                status.style.background = '';
+                status.style.color = '';
+            }, 300);
+        }, 2000);
+    }
+    
+    // Code snippet functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        function getCurrentCode() {
+            const activeCodeElement = document.querySelector(`#code-${currentLanguage} code`);
+            return activeCodeElement ? activeCodeElement.innerText : '';
+        }
+        
+        function getFileExtension(lang) {
+            const extensions = {
+                'python': 'py',
+                'julia': 'jl',
+                'javascript': 'js',
+                'c': 'c',
+                'matlab': 'm'
+            };
+            return extensions[lang] || 'txt';
+        }
+        
+        document.getElementById('copy-snippet')?.addEventListener('click', function() {
+            const code = getCurrentCode();
+            navigator.clipboard.writeText(code);
+            this.title = 'Copied!';
+            setTimeout(()=>{this.title='Copy code';}, 1200);
+        });
+        
+        document.getElementById('download-snippet')?.addEventListener('click', function() {
+            const code = getCurrentCode();
+            const extension = getFileExtension(currentLanguage);
+            const filename = `lorenz_system.${extension}`;
+            
+            const blob = new Blob([code], {type: 'text/plain'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        document.getElementById('open-colab')?.addEventListener('click', function() {
+            const code = getCurrentCode();
+            let codeWithComments;
+            
+            if (currentLanguage === 'python') {
+                codeWithComments = `# IAM529 - Lorenz System Example\n# Run this code to explore the Lorenz attractor\n\n${code}`;
+            } else if (currentLanguage === 'julia') {
+                codeWithComments = `# IAM529 - Lorenz System Example (Julia)\n# Run this code to explore the Lorenz attractor\n\n${code}`;
+            }
+            
+            const colabDirectUrl = `https://colab.research.google.com/#create=true&language=${currentLanguage}`;
+            
+            window.open(colabDirectUrl, '_blank');
+            navigator.clipboard.writeText(codeWithComments);
+            
+            this.title = 'Opening Colab... Code copied to clipboard!';
+            setTimeout(()=>{this.title='Open in Google Colab';}, 3000);
+        });
+        
+        document.getElementById('share-snippet')?.addEventListener('click', function() {
+            const code = getCurrentCode();
+            const shareUrl = window.location.origin + window.location.pathname + `#snippet=${currentLanguage}&code=` + encodeURIComponent(code);
+            navigator.clipboard.writeText(shareUrl);
+            this.title = 'Link Copied!';
+            setTimeout(()=>{this.title='Share code';}, 1200);
+        });
+        
+        // Initialize notes auto-save
+        const notesTextarea = document.getElementById('main-notes');
+        if (notesTextarea) {
+            // Load saved notes
+            notesTextarea.value = localStorage.getItem('main-notes') || '';
+            
+            // Auto-save on input
+            notesTextarea.addEventListener('input', function() {
+                localStorage.setItem('main-notes', this.value);
+                showNotesStatus('Auto-saved', true);
+            });
+        }
+    });
+    </script>
+        
+    <div style="text-align:center;margin-top:3rem;">
+        <a href="index.html" class="nav-button">Back to Homepage</a>
+    </div>
+</main>
+<script src="playground.js"></script>
 </body>
 </html> 
