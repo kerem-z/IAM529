@@ -6,6 +6,20 @@
     <title>IAM529 Playground</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- MathJax for LaTeX rendering -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        }
+      };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <!-- highlight.js for code blocks -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <script>window.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('pre code').forEach(el=>hljs.highlightElement(el));});</script>
 </head>
 <body>
     <nav class="nav-container">
@@ -31,7 +45,7 @@
         </div>
     </nav>
     <main style="max-width:1300px;margin:0 auto;padding:2rem 0;">
-        <h1 style="text-align:center;">Lorenz Attractor Playground</h1>
+        <h1 style="text-align:center;">  "TESTING" Lorenz Attractor Playground</h1>
         <canvas id="playground-lorenz"></canvas>
         <form id="lorenz-controls" style="display:flex;justify-content:center;gap:2rem;align-items:center;margin:2rem 0 1rem 0;flex-wrap:wrap;">
             <label>Sigma (σ): <input type="range" min="5" max="20" step="0.1" value="10" id="sigma-slider"></label>
@@ -41,6 +55,91 @@
             <button type="button" id="reset-btn">Reset</button>
         </form>
         <p style="text-align:center;color:var(--text-secondary);font-size:1rem;">Drag with your mouse to rotate the attractor in 3D.</p>
+        <section style="max-width:900px;margin:2rem auto 0 auto;">
+            <h2> Math Formulas to check if LaTeX is working </h2>
+            <p>Here are some formulas rendered with LaTeX:</p>
+            <ul>
+                <li>Inline: $\dot{x} = \sigma (y - x)$</li>
+                <li>Block:
+                    $$
+                    \begin{aligned}
+                    \dot{x} &= \sigma (y - x) \\
+                    \dot{y} &= x (\rho - z) - y \\
+                    \dot{z} &= x y - \beta z
+                    \end{aligned}
+                    $$
+                </li>
+                <li>Eigenvalues: $\lambda = \frac{-(\sigma+1) \pm \sqrt{(\sigma+1)^2 + 4\sigma(\rho-1)}}{2}$</li>
+            </ul>
+            <h2>Code Example</h2>
+            <div class="code-card" style="position:relative;max-width:700px;margin:1.5rem auto 0 auto;background:var(--code-bg,#f5f5f5);border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.07);padding:1.2rem 1.2rem 1rem 1.2rem;">
+                <button class="copy-btn" style="position:absolute;top:12px;right:12px;padding:0.3rem 0.7rem;font-size:0.95rem;border:none;border-radius:6px;background:#e0e0e0;cursor:pointer;transition:background 0.2s;">Copy</button>
+                <pre style="margin:0;"><code class="python"># Lorenz system step
+sigma, rho, beta = 10, 28, 8/3
+x, y, z = 0.01, 0, 0
+dt = 0.01
+for _ in range(1000):
+    dx = sigma * (y - x)
+    dy = x * (rho - z) - y
+    dz = x * y - beta * z
+    x += dx * dt
+    y += dy * dt
+    z += dz * dt
+</code></pre>
+            </div>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.copy-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const code = btn.parentElement.querySelector('code').innerText;
+                        navigator.clipboard.writeText(code);
+                        btn.textContent = 'Copied!';
+                        setTimeout(()=>{btn.textContent='Copy';}, 1200);
+                    });
+                });
+            });
+            </script>
+        </section>
+        <section style="max-width:900px;margin:2.5rem auto 0 auto;">
+            <h2>Try Python Live (Pyodide)</h2>
+            <div id="pyodide-runner" style="background:var(--code-bg,#f5f5f5);border-radius:12px;box-shadow:0 4px 24px rgba(0,0,0,0.07);padding:1.2rem 1.2rem 1rem 1.2rem;">
+                <textarea id="py-code" style="width:100%;height:140px;font-family:JetBrains Mono,monospace;font-size:1rem;border-radius:8px;padding:0.7rem 0.8rem;resize:vertical;">print('Hello from Pyodide!')\nfor i in range(5):\n    print('i =', i)</textarea>
+                <button id="run-py" style="margin-top:0.7rem;padding:0.4rem 1.2rem;font-size:1rem;border:none;border-radius:6px;background:#1976d2;color:#fff;cursor:pointer;float:right;">Run Python</button>
+                <div id="pyodide-status" style="margin-top:0.7rem;color:#888;font-size:0.95rem;">Loading Python (Pyodide)...</div>
+                <pre id="py-output" style="margin-top:1.2rem;background:#222;color:#fff;padding:1rem;border-radius:8px;min-height:2em;overflow-x:auto;"></pre>
+            </div>
+            <script type="text/javascript">
+            let pyodideReady = false;
+            let pyodide = null;
+            async function mainPyodide() {
+                pyodide = await loadPyodide();
+                pyodideReady = true;
+                document.getElementById('pyodide-status').textContent = 'Python ready!';
+            }
+            mainPyodide();
+            document.getElementById('run-py').onclick = async function() {
+                const code = document.getElementById('py-code').value;
+                const output = document.getElementById('py-output');
+                if (!pyodideReady) {
+                    output.textContent = 'Python is still loading...';
+                    return;
+                }
+                output.textContent = '';
+                try {
+                    let result = await pyodide.runPythonAsync(code);
+                    if (result !== undefined) {
+                        output.textContent += result + '\n';
+                    }
+                } catch (err) {
+                    output.textContent = err;
+                }
+                // Capture stdout
+                output.textContent = pyodide._module.FS.readFile('/dev/stdout', {encoding:'utf8'}) + output.textContent;
+                pyodide._module.FS.writeFile('/dev/stdout', '', {encoding:'utf8'});
+            };
+            </script>
+            <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+        </section>
         <div style="text-align:center;margin-top:2rem;">
             <a href="index.html" class="nav-button">Back to Homepage</a>
         </div>
