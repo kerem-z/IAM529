@@ -45,8 +45,8 @@
         </div>
     </nav>
     <main style="max-width:1300px;margin:0 auto;padding:2rem 0;position:relative;">
-        <h1 style="text-align:center;">IAM529 Interactive Playground</h1>
-        <p style="text-align:center;color:var(--text-secondary);font-size:1.1rem;margin-bottom:3rem;">Explore nonlinear dynamics through interactive visualizations and simulations</p>
+        <h1 style="text-align:center;">IAM529  Playground</h1>
+        <p style="text-align:center;color:var(--text-secondary);font-size:1.1rem;margin-bottom:3rem;">I will write some explanatory stuff here</p>
         
         <!-- Fixed Notes Panel on Right Side -->
         <div id="notes-panel" class="notes-panel">
@@ -57,8 +57,12 @@
                 </button>
             </div>
             <div class="notes-content">
-                <textarea id="main-notes" class="main-notes-textarea" placeholder="Take notes about the Lorenz system, mathematical concepts, or your observations..."></textarea>
+                <textarea id="main-notes" class="main-notes-textarea" placeholder="Some notes can be written here"></textarea>
+                <div id="notes-preview" class="notes-preview" style="display:none;"></div>
                 <div class="notes-actions">
+                    <button onclick="toggleNotesPreview()" class="notes-action-btn preview-btn" id="preview-toggle">
+                        <i class="fas fa-eye"></i> Preview
+                    </button>
                     <button onclick="downloadNotes()" class="notes-action-btn">
                         <i class="fas fa-download"></i> Download
                     </button>
@@ -118,7 +122,7 @@
             <!-- Hidden Demo Section for Lorenz -->
             <div id="lorenz-demo" style="display:none;max-width:900px;margin:3rem auto 0 auto;">
                 <div style="margin-bottom:2rem;">
-                    <h2>Lorenz System Interactive Demo</h2>
+                    <h2>Lorenz System Demo</h2>
                 </div>
                 
                 <canvas id="playground-lorenz"></canvas>
@@ -146,8 +150,8 @@
                 
                 <!-- Lorenz-specific LaTeX Testing -->
                 <section style="margin:3rem 0;">
-                    <h3>Lorenz System Mathematics</h3>
-                    <p>Testing LaTeX rendering with Lorenz attractor equations and symbols:</p>
+                    <h3>Testing LateX rendering for website</h3>
+                    <p></p>
                     
                     <p>The Lorenz system: $\dot{x} = \sigma(y-x)$, $\dot{y} = x(\rho-z)-y$, $\dot{z} = xy-\beta z$</p>
                     
@@ -175,7 +179,7 @@
                     </button>
                     
                     <div id="code-section" style="display:none;">
-                        <h3>Implementation Code</h3>
+                        <h3></h3>
                         
                         <!-- Language Selection Tabs -->
                         <div class="language-tabs" style="display:flex;gap:0.5rem;margin-bottom:1.5rem;border-bottom:1px solid #e0e0e0;">
@@ -910,6 +914,14 @@ lorenz_attractor();
         background: #4b5563;
     }
     
+    .notes-action-btn.preview-btn.active {
+        background: #059669;
+    }
+    
+    .notes-action-btn.preview-btn.active:hover {
+        background: #047857;
+    }
+    
     .notes-status {
         margin-top: 1rem;
         padding: 0.5rem;
@@ -971,6 +983,83 @@ lorenz_attractor();
     .notes-panel.open ~ .notes-trigger-btn {
         opacity: 0;
         pointer-events: none;
+    }
+    
+    .notes-preview {
+        flex: 1;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        box-sizing: border-box;
+        background: #ffffff;
+        overflow-y: auto;
+        min-height: 200px;
+    }
+    
+    .notes-preview h1, .notes-preview h2, .notes-preview h3 {
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        color: #1a202c;
+    }
+    
+    .notes-preview p {
+        margin-bottom: 1rem;
+    }
+    
+    .notes-preview code {
+        background: #f1f5f9;
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-family: 'SF Mono', Monaco, monospace;
+        font-size: 0.9rem;
+    }
+    
+    .notes-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .notes-action-btn {
+        flex: 1;
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-width: 80px;
+    }
+    
+    .notes-action-btn:hover {
+        background: #5a67d8;
+        transform: translateY(-1px);
+    }
+    
+    .notes-action-btn.secondary {
+        background: #6b7280;
+    }
+    
+    .notes-action-btn.secondary:hover {
+        background: #4b5563;
+    }
+    
+    .notes-action-btn.preview-btn.active {
+        background: #059669;
+    }
+    
+    .notes-action-btn.preview-btn.active:hover {
+        background: #047857;
     }
     </style>
 
@@ -1185,6 +1274,33 @@ lorenz_attractor();
         }
     }
     
+    let isPreviewMode = false;
+    
+    function toggleNotesPreview() {
+        const textarea = document.getElementById('main-notes');
+        const preview = document.getElementById('notes-preview');
+        const toggleBtn = document.getElementById('preview-toggle');
+        
+        isPreviewMode = !isPreviewMode;
+        
+        if (isPreviewMode) {
+            // Switch to preview mode
+            textarea.style.display = 'none';
+            preview.style.display = 'block';
+            toggleBtn.innerHTML = '<i class="fas fa-edit"></i> Edit';
+            toggleBtn.classList.add('active');
+            
+            // Update preview content
+            updatePreview();
+        } else {
+            // Switch to edit mode
+            textarea.style.display = 'block';
+            preview.style.display = 'none';
+            toggleBtn.innerHTML = '<i class="fas fa-eye"></i> Preview';
+            toggleBtn.classList.remove('active');
+        }
+    }
+    
     function downloadNotes() {
         const textarea = document.getElementById('main-notes');
         const content = textarea.value;
@@ -1211,6 +1327,12 @@ lorenz_attractor();
         if (confirm('Are you sure you want to clear all notes?')) {
             document.getElementById('main-notes').value = '';
             localStorage.removeItem('main-notes');
+            
+            // Clear preview if in preview mode
+            if (isPreviewMode) {
+                document.getElementById('notes-preview').innerHTML = '';
+            }
+            
             showNotesStatus('Notes cleared!', true);
         }
     }
@@ -1312,9 +1434,49 @@ lorenz_attractor();
             notesTextarea.addEventListener('input', function() {
                 localStorage.setItem('main-notes', this.value);
                 showNotesStatus('Auto-saved', true);
+                
+                // Update preview if in preview mode
+                if (isPreviewMode) {
+                    updatePreview();
+                }
             });
         }
     });
+    
+    function updatePreview() {
+        const textarea = document.getElementById('main-notes');
+        const preview = document.getElementById('notes-preview');
+        const content = textarea.value;
+        
+        if (!content.trim()) {
+            preview.innerHTML = '<p style="color:#9ca3af;font-style:italic;">No notes yet. Switch to Edit mode to start writing.</p>';
+            return;
+        }
+        
+        // Convert textarea content to HTML with better formatting
+        let htmlContent = content
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n\s*\n/g, '</p><p>')
+            .replace(/\n/g, '<br>')
+            .replace(/^/, '<p>')
+            .replace(/$/, '</p>')
+            .replace(/<p><\/p>/g, '');
+        
+        // Handle headings
+        htmlContent = htmlContent
+            .replace(/<p># (.*?)<\/p>/g, '<h1>$1</h1>')
+            .replace(/<p>## (.*?)<\/p>/g, '<h2>$1</h2>')
+            .replace(/<p>### (.*?)<\/p>/g, '<h3>$1</h3>');
+        
+        preview.innerHTML = htmlContent;
+        
+        // Re-render MathJax
+        if (window.MathJax && window.MathJax.typesetPromise) {
+            MathJax.typesetPromise([preview]).catch((err) => console.log('MathJax error:', err));
+        }
+    }
     </script>
         
     <div style="text-align:center;margin-top:3rem;">
