@@ -53,7 +53,7 @@
             <div class="notes-header">
                 <span class="notes-title">Notes</span>
                 <button id="notes-toggle" class="notes-toggle-icon" onclick="toggleNotesPanel()">
-                    <i class="fas fa-chevron-left"></i>
+                    <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
             <div class="notes-content">
@@ -69,6 +69,12 @@
                 <div id="notes-status" class="notes-status"></div>
             </div>
         </div>
+        
+        <!-- Visible Notes Trigger Button -->
+        <button id="notes-trigger" class="notes-trigger-btn" onclick="openNotesPanel()" title="Open Notes Panel">
+            <i class="fas fa-sticky-note"></i>
+            <span>Notes</span>
+        </button>
         
         <div class="main-content">
             <div class="playground-grid">
@@ -433,14 +439,35 @@ lorenz_attractor();
     </div>
 
     <style>
+    @media (max-width: 1200px) {
+        .notes-panel {
+            width: 300px;
+        }
+        .notes-panel.open ~ .main-content {
+            margin-left: 300px;
+        }
+    }
+    
     @media (max-width: 768px) {
         .notes-panel {
             width: 100%;
             top: 70px;
         }
         .notes-panel.open ~ .main-content {
-            margin-right: 0;
+            margin-left: 0;
             display: none;
+        }
+        .playground-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        .notes-trigger-btn {
+            top: 60%;
+            min-height: 60px;
+            padding: 0.5rem 0.4rem;
+        }
+        .notes-trigger-btn span {
+            font-size: 0.7rem;
         }
     }
     
@@ -756,22 +783,22 @@ lorenz_attractor();
         font-weight: bold;
     }
     
-    /* Right-side Notes Panel Styling */
+    /* Left-side Notes Panel Styling */
     .main-content {
-        margin-right: 0;
-        transition: margin-right 0.3s ease;
+        margin-left: 0;
+        transition: margin-left 0.3s ease;
     }
     
     .notes-panel {
         position: fixed;
         top: 80px;
-        right: 0;
+        left: 0;
         width: 350px;
         height: calc(100vh - 100px);
         background: #ffffff;
-        border-left: 1px solid #e0e0e0;
-        box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-        transform: translateX(100%);
+        border-right: 1px solid #e0e0e0;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        transform: translateX(-100%);
         transition: transform 0.3s ease;
         z-index: 1000;
         display: flex;
@@ -783,7 +810,7 @@ lorenz_attractor();
     }
     
     .notes-panel.open ~ .main-content {
-        margin-right: 350px;
+        margin-left: 350px;
     }
     
     .notes-header {
@@ -899,20 +926,51 @@ lorenz_attractor();
         color: #059669;
     }
     
-    @media (max-width: 1200px) {
-        .notes-panel {
-            width: 300px;
-        }
-        .notes-panel.open ~ .main-content {
-            margin-right: 300px;
-        }
+    /* Visible Notes Trigger Button */
+    .notes-trigger-btn {
+        position: fixed;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 0.5rem;
+        border-radius: 0 8px 8px 0;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 999;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        min-height: 80px;
     }
     
-    @media (max-width: 768px) {
-        .playground-grid {
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
+    .notes-trigger-btn:hover {
+        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        transform: translateY(-50%) translateX(2px);
+        box-shadow: 3px 3px 15px rgba(0,0,0,0.3);
+    }
+    
+    .notes-trigger-btn i {
+        font-size: 1.2rem;
+    }
+    
+    .notes-trigger-btn span {
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+    
+    /* Hide trigger when notes panel is open */
+    .notes-panel.open ~ .notes-trigger-btn {
+        opacity: 0;
+        pointer-events: none;
     }
     </style>
 
@@ -1106,6 +1164,14 @@ lorenz_attractor();
     }
     
     // Notes panel functions
+    function openNotesPanel() {
+        const panel = document.getElementById('notes-panel');
+        const icon = document.querySelector('#notes-toggle i');
+        
+        panel.classList.add('open');
+        icon.className = 'fas fa-chevron-left';
+    }
+    
     function toggleNotesPanel() {
         const panel = document.getElementById('notes-panel');
         const icon = document.querySelector('#notes-toggle i');
@@ -1113,9 +1179,9 @@ lorenz_attractor();
         panel.classList.toggle('open');
         
         if (panel.classList.contains('open')) {
-            icon.className = 'fas fa-chevron-right';
-        } else {
             icon.className = 'fas fa-chevron-left';
+        } else {
+            icon.className = 'fas fa-chevron-right';
         }
     }
     
