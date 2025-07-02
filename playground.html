@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IAM529 - Applied Nonlinear Dynamics</title>
+    <title>IAM529 Playground</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -20,7 +20,7 @@
                 <div class="nav-links">
                     <a href="index.html" class="nav-button">Homepage</a>
                     <a href="syllabus.html" class="nav-button">Syllabus</a>
-                    <a href="playground.html" class="nav-button">Playground</a>
+                    <a href="playground.html" class="nav-button active">Playground</a>
                     <a href="resources.html" class="nav-button">Resources</a>
                     <span class="nav-spacer"></span>
                     <button class="theme-toggle" aria-label="Toggle dark mode">
@@ -30,15 +30,21 @@
             </div>
         </div>
     </nav>
-    <canvas id="lorenz-bg"></canvas>
-    <header style="text-align:center; margin-top:2rem;">
-        <h1 style="font-size:2.5rem; font-weight:600; margin-bottom:0.5rem;">IAM529: Applied Nonlinear Dynamics</h1>
-        <p style="font-size:1.2rem; color:var(--text-secondary);">Course website(?) for IAM529</p>
-        <p style="font-size:1rem; color:var(--text-secondary); margin-top:0.5rem;">
-            <strong>Instructor:</strong> Omur Ugur &nbsp;|&nbsp;
-            <strong>Email:</strong> <a href="mailto:instructor@university.edu">temp@metu.edu.tr</a>
-        </p>
-    </header>
-    <script src="script.js"></script>
+    <main style="max-width:1300px;margin:0 auto;padding:2rem 0;">
+        <h1 style="text-align:center;">Lorenz Attractor Playground</h1>
+        <canvas id="playground-lorenz"></canvas>
+        <form id="lorenz-controls" style="display:flex;justify-content:center;gap:2rem;align-items:center;margin:2rem 0 1rem 0;flex-wrap:wrap;">
+            <label>Sigma (σ): <input type="range" min="5" max="20" step="0.1" value="10" id="sigma-slider"></label>
+            <label>Rho (ρ): <input type="range" min="20" max="40" step="0.1" value="28" id="rho-slider"></label>
+            <label>Beta (β): <input type="range" min="2" max="4" step="0.01" value="2.6667" id="beta-slider"></label>
+            <label>Rotation Speed: <input type="range" min="0.001" max="0.05" step="0.001" value="0.010" id="speed-slider"></label>
+            <button type="button" id="reset-btn">Reset</button>
+        </form>
+        <p style="text-align:center;color:var(--text-secondary);font-size:1rem;">Drag with your mouse to rotate the attractor in 3D.</p>
+        <div style="text-align:center;margin-top:2rem;">
+            <a href="index.html" class="nav-button">Back to Homepage</a>
+        </div>
+    </main>
+    <script src="playground.js"></script>
 </body>
 </html> 
